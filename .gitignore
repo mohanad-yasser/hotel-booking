@@ -1,0 +1,62 @@
+# ==========================================================
+# 🧩 Hotel Booking Project - Git Ignore Rules
+# ==========================================================
+
+# --- Jupyter Checkpoints ---
+.ipynb_checkpoints/
+
+# --- Python Cache & Bytecode ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# --- Virtual Environments ---
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Notebook & Logs ---
+*.log
+*.tmp
+*.bak
+*.swp
+
+# --- OS / System Files ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# --- VS Code Settings ---
+.vscode/
+.history/
+
+# --- Package Management ---
+*.egg-info/
+*.egg
+dist/
+build/
+
+# --- Pip Caches ---
+pip-wheel-metadata/
+__pypackages__/
+
+# --- Jupyter Runtime Data ---
+.jupyter/
+.ipython/
+
+# --- Others ---
+*.sqlite3
+*.db
+
+# ==========================================================
+# ✅ Notes:
+# 1. This ensures temporary files & backups (like .ipynb_checkpoints)
+#    never get pushed to GitHub.
+# 2. Your actual notebooks (.ipynb) and code remain untouched.
+# ==========================================================

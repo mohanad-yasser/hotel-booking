@@ -1,0 +1,47 @@
+# ==========================================================
+# 📦 Hotel Booking Project - Requirements
+# ==========================================================
+# 💡 How to install all dependencies:
+#
+#    pip install -r requirements.txt
+#
+# This installs all Python libraries needed for running
+# and analyzing the Hotel Booking notebook project.
+# ==========================================================
+
+# --- Core Data Science Stack ---
+pandas==2.3.3
+numpy==2.2.4
+scipy==1.16.2
+matplotlib==3.10.1
+seaborn==0.13.2
+
+# --- Machine Learning ---
+scikit-learn==1.7.2
+joblib==1.5.2
+
+# --- Explainability (XAI) ---
+shap==0.48.0
+lime==0.2.0.1
+
+# --- Utilities ---
+tqdm==4.67.1
+scikit-image==0.25.2
+
+# --- Jupyter Notebook Environment ---
+jupyterlab==4.4.9
+notebook==7.4.7
+ipykernel==6.30.1
+
+# ==========================================================
+# 🧩 VS Code Users:
+# To run notebooks inside VS Code, make sure these
+# extensions are installed:
+#    1️⃣ Python (by Microsoft)
+#    2️⃣ Jupyter (by Microsoft)
+#
+# You can install them from the Extensions tab (Ctrl+Shift+X)
+# or using terminal commands:
+#    code --install-extension ms-python.python
+#    code --install-extension ms-toolsai.jupyter
+# ==========================================================
