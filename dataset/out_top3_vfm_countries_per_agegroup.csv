@@ -1,0 +1,16 @@
+age_group,hotel_country,n,median_vfm
+18-24,China,231,8.8
+18-24,Netherlands,224,8.75
+18-24,Canada,222,8.7
+25-34,China,680,8.8
+25-34,Spain,674,8.7
+25-34,New Zealand,659,8.7
+35-44,Netherlands,609,8.8
+35-44,New Zealand,672,8.7
+35-44,Canada,645,8.7
+45-54,China,303,8.8
+45-54,New Zealand,310,8.7
+45-54,Thailand,358,8.6
+55+,New Zealand,211,8.7
+55+,Netherlands,205,8.7
+55+,Spain,209,8.6
