@@ -1,0 +1,32 @@
+[
+  {
+    "id": "TC01",
+    "user_query": "Hotels in Paris",
+    "cypher_answer": "- L'Étoile Palace | City: Paris | Country: Unknown | Stars: 5.0 | Avg Review: 8.947064726542907 | Cleanliness: 8.8 | Comfort: 9.4 | Facilities: 8.7",
+    "embeddings_answer": "Embeddings Results (Model 1):\n- L'Étoile Palace | Paris, France | sim=0.7570\n- Kremlin Suites | Moscow, Russia | sim=0.6940\n- The Golden Oasis | Dubai, United Arab Emirates | sim=0.6913\n- Tango Boutique | Buenos Aires, Argentina | sim=0.6728\n- Gaudi's Retreat | Barcelona, Spain | sim=0.6672\n- The Bund Palace | Shanghai, China | sim=0.6594\n- The Bosphorus Inn | Istanbul, Turkey | sim=0.6571\n- Copacabana Lux | Rio de Janeiro, Brazil | sim=0.6563\n- The Orchid Palace | Bangkok, Thailand | sim=0.6530\n- Han River Oasis | Seoul, South Korea | sim=0.6447",
+    "expected_keywords": [
+      "paris",
+      "hotel"
+    ]
+  },
+  {
+    "id": "TC02",
+    "user_query": "Show me the latest reviews for The Golden Oasis",
+    "cypher_answer": "Reviews (latest):\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Year yard generation dog. Smile guess sit line. Evening go which media notice rest each.\n- Hotel: The Golden Oasis | Traveller type: Business | Score: 9.1 | Review: Too on great practice herself natural story.\nBack make stay financial consider. Heart method environment girl. Generation public lay loss.\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Close great order drop part us. Cultural television other detail common learn. Thank pretty sea.\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.1 | Review: List blood dog poor child series night network. Weight every system economy general can reach. Rest floor fly wind finish.\n- Hotel: The Golden Oasis | Traveller type: Solo | Score: 9.2 | Review: Bring hour position when yard necessary. Amount design real will step it.\nTwo know a. Tv region provide bit.\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.3 | Review: Get weight site training PM itself cut. Partner yourself music air.\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Court wear moment. Son administration choose security tonight. Serve same man figure. Mind fish camera his speech president their.\n- Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.0 | Review: Shoulder idea southern human. Everybody mission without during move. Activity billion character amount service.\n- Hotel: The Golden Oasis | Traveller type: Solo | Score: 8.8 | Review: Less can upon hotel between season music. Health left entire rule employee explain.\nFive last firm walk. Market arrive have girl couple.\n- Hotel: The Golden Oasis | Traveller type: Solo | Score: 9.3 | Review: Issue war manage impact. Plant remain box some second prove. Charge wide he so kid tend nor.",
+    "embeddings_answer": "Embeddings Results (Model 1):\n- The Golden Oasis | Dubai, United Arab Emirates | sim=0.8201\n- Han River Oasis | Seoul, South Korea | sim=0.7223\n- Copacabana Lux | Rio de Janeiro, Brazil | sim=0.6375\n- The Orchid Palace | Bangkok, Thailand | sim=0.6368\n- L'Étoile Palace | Paris, France | sim=0.6351\n- The Gateway Royale | Mumbai, India | sim=0.6286\n- Table Mountain View | Cape Town, South Africa | sim=0.6242\n- The Bund Palace | Shanghai, China | sim=0.6235\n- Gaudi's Retreat | Barcelona, Spain | sim=0.6210\n- The Royal Compass | London, United Kingdom | sim=0.6097",
+    "expected_keywords": [
+      "golden oasis",
+      "review"
+    ]
+  },
+  {
+    "id": "TC03",
+    "user_query": "Can i travel from Egypt to Singapore without a visa?",
+    "cypher_answer": "Visa requirements:\n- Visa type required: NO_VISA",
+    "embeddings_answer": "Embeddings Results (Model 1):\n- Marina Bay Zenith | Singapore, Singapore | sim=0.5987\n- Nile Grandeur | Cairo, Egypt | sim=0.5978\n- Sydney Harbour Grand | Sydney, Australia | sim=0.5703\n- Han River Oasis | Seoul, South Korea | sim=0.5558\n- The Savannah House | Lagos, Nigeria | sim=0.5530\n- The Golden Oasis | Dubai, United Arab Emirates | sim=0.5513\n- Kyo-to Grand | Tokyo, Japan | sim=0.5467\n- Copacabana Lux | Rio de Janeiro, Brazil | sim=0.5319\n- Table Mountain View | Cape Town, South Africa | sim=0.5303\n- The Kiwi Grand | Wellington, New Zealand | sim=0.5297",
+    "expected_keywords": [
+      "visa",
+      "singapore"
+    ]
+  }
+]

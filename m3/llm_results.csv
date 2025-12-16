@@ -1,0 +1,44 @@
+test_id,model,scenario,latency_ms,accuracy_proxy,cost_usd,answer
+TC01,deepseek,CYPHER_ONLY,4112.512900028378,1.0,0.0,"L'Étoile Palace is a 5-star hotel in Paris with an average review score of 8.9. It has a cleanliness rating of 8.8, comfort rating of 9.4, and facilities rating of 8.7."
+TC01,llama,CYPHER_ONLY,1673.711899900809,1.0,0.0,"You are looking for hotels in Paris. 
+
+L'Étoile Palace is located in Paris."
+TC01,gemma,CYPHER_ONLY,1164.4264999777079,0.0,0.0,L'Étoile Palace
+TC02,deepseek,REVIEWS_ONLY,14231.721899937838,0.5,0.0,"- **Traveller type:** Couple | **Score:** 9.2 | **Review:** Year yard generation dog. Smile guess sit line. Evening go which media notice rest each.
+- **Traveller type:** Business | **Score:** 9.1 | **Review:** Too on great practice herself natural story. Back make stay financial consider. Heart method environment girl. Generation public lay loss.
+- **Traveller type:** Couple | **Score:** 9.2 | **Review:** Close great order drop part us. Cultural television other detail common learn. Thank pretty sea.
+- **Traveller type:** Couple | **Score:** 9.1 | **Review:** List blood dog poor child series night network. Weight every system economy general can reach. Rest floor fly wind finish.
+- **Traveller type:** Solo | **Score:** 9.2 | **Review:** Bring hour position when yard necessary. Amount design real will step it. Two know a. Tv region provide bit.
+- **Traveller type:** Couple | **Score:** 9.3 | **Review:** Get weight site training PM itself cut. Partner yourself music air.
+- **Traveller type:** Couple | **Score:** 9.2 | **Review:** Court wear moment. Son administration choose security tonight. Serve same man figure. Mind fish camera his speech president their.
+- **Traveller type:** Couple | **Score:** 9.0 | **Review:** Shoulder idea southern human. Everybody mission without during move. Activity billion character amount service.
+- **Traveller type:** Solo | **Score:** 8.8 | **Review:** Less can upon hotel between season music. Health left entire rule employee explain. Five last firm walk. Market arrive have girl couple.
+- **Traveller type:** Solo | **Score:** 9.3 | **Review:** Issue war manage impact. Plant remain box some second prove. Charge wide he so kid tend nor."
+TC02,llama,REVIEWS_ONLY,6125.937500037253,1.0,0.0,"• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Year yard generation dog. Smile guess sit line. Evening go which media notice rest each.
+• Hotel: The Golden Oasis | Traveller type: Business | Score: 9.1 | Review: Too on great practice herself natural story. Back make stay financial consider. Heart method environment girl. Generation public lay loss.
+• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Close great order drop part us. Cultural television other detail common learn. Thank pretty sea.
+• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.1 | Review: List blood dog poor child series night network. Weight every system economy general can reach. Rest floor fly wind finish.
+• Hotel: The Golden Oasis | Traveller type: Solo | Score: 9.2 | Review: Bring hour position when yard necessary. Amount design real will step it. Two know a. Tv region provide bit.
+• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.3 | Review: Get weight site training PM itself cut. Partner yourself music air.
+• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: Court wear moment. Son administration choose security tonight. Serve same man figure. Mind fish camera his speech president their.
+• Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.0 | Review: Shoulder idea southern human. Everybody mission without during move. Activity billion character amount service.
+• Hotel: The Golden Oasis | Traveller type: Solo | Score: 8.8 | Review: Less can upon hotel between season music. Health left entire rule employee explain. Five last firm walk. Market arrive have girl couple.
+• Hotel: The Golden Oasis | Traveller type: Solo | Score: 9.3 | Review: Issue war manage impact. Plant remain box some second prove. Charge wide he so kid tend nor."
+TC02,gemma,REVIEWS_ONLY,3070.3683998435736,1.0,0.0,"Here are the latest reviews for The Golden Oasis:
+
+- Year yard generation dog. Smile guess sit line. Evening go which media notice rest each.
+- Too on great practice herself natural story.
+Back make stay financial consider. Heart method environment girl. Generation public lay loss.
+- Close great order drop part us. Cultural television other detail common learn. Thank pretty sea.
+- List blood dog poor child series night network. Weight every system economy general can reach. Rest floor fly wind finish.
+- Bring hour position when yard necessary. Amount design real will step it.
+Two know a. Tv region provide bit.
+- Get weight site training PM itself cut. Partner yourself music air.
+- Court wear moment. Son administration choose security tonight. Serve same man figure. Mind fish camera his speech president their.
+- Shoulder idea southern human. Everybody mission without during move. Activity billion character amount service.
+- Less can upon hotel between season music. Health left entire rule employee explain.
+Five last firm walk. Market arrive have girl couple.
+- Issue war manage impact. Plant remain box some second prove. Charge wide he so kid tend nor."
+TC03,deepseek,VISA_REQUIREMENT,2054.114199941978,0.5,0.0,Visa type required: NO_VISA
+TC03,llama,VISA_REQUIREMENT,1480.1280999090523,0.5,0.0,NO_VISA
+TC03,gemma,VISA_REQUIREMENT,1358.479999937117,0.5,0.0,NO_VISA

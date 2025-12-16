@@ -1,0 +1,17 @@
+{
+  "deepseek": {
+    "avg_latency_ms": 6799.449666636065,
+    "avg_accuracy_proxy": 0.6666666666666666,
+    "total_cost_usd": 0.0
+  },
+  "llama": {
+    "avg_latency_ms": 3093.2591666157045,
+    "avg_accuracy_proxy": 0.8333333333333334,
+    "total_cost_usd": 0.0
+  },
+  "gemma": {
+    "avg_latency_ms": 1864.4249665861328,
+    "avg_accuracy_proxy": 0.5,
+    "total_cost_usd": 0.0
+  }
+}

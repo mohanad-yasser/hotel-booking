@@ -55,6 +55,9 @@ def main_llm_call_with_metrics(
     visa_req = _parse_visa_requirement_single(cypher_answer)
     visa_free = _parse_visa_free_destinations(cypher_answer)
 
+    # ✅ NEW: Parse "popular hotels for nationality" output (baseline-only intent)
+    popular_hotels = _parse_popular_hotels_for_nationality(cypher_answer)
+
     # Parse embeddings
     emb_hotels_m1 = _parse_embeddings(embeddings_model1)
     emb_hotels_m2 = _parse_embeddings(embeddings_model2)
@@ -71,6 +74,9 @@ def main_llm_call_with_metrics(
         scenario, details = "VISA_REQUIREMENT", "Visa requirement detected in Cypher output."
     elif visa_free:
         scenario, details = "VISA_FREE_LIST", "Visa-free destinations detected in Cypher output."
+    elif popular_hotels:
+        # ✅ NEW: Baseline-only scenario
+        scenario, details = "POPULAR_HOTELS_FOR_NATIONALITY", "Popularity-by-nationality results detected in Cypher output."
     else:
         scenario, details = _detect_scenario(cypher_hotels, emb_hotels, cypher_reviews)
 
@@ -94,6 +100,29 @@ def main_llm_call_with_metrics(
                 context_lines.append(f"- {c} ({vt})")
             else:
                 context_lines.append(f"- {c}")
+        context_lines.append("")
+
+    # ✅ NEW: Popular hotels for nationality block
+    if popular_hotels:
+        context_lines.append("Popular hotels for nationality:")
+        for h in popular_hotels:
+            line = (
+                f"- {h.get('name', 'Unknown')}"
+                f" | City: {h.get('city', 'Unknown')}"
+                f" | Country: {h.get('country', 'Unknown')}"
+                f" | Stars: {h.get('stars', 'Unknown')}"
+                f" | Avg Review: {h.get('avg_review', 'Unknown')}"
+            )
+            # optional
+            if h.get("cleanliness") is not None:
+                line += f" | Cleanliness: {h.get('cleanliness')}"
+            if h.get("comfort") is not None:
+                line += f" | Comfort: {h.get('comfort')}"
+            if h.get("facilities") is not None:
+                line += f" | Facilities: {h.get('facilities')}"
+            if h.get("stay_count") is not None:
+                line += f" | Stay Count: {h.get('stay_count')}"
+            context_lines.append(line)
         context_lines.append("")
 
     # 1) Reviews
@@ -125,8 +154,8 @@ def main_llm_call_with_metrics(
             )
             context_lines.append(line)
     else:
-        # If no hotels and no reviews and no visa, fall back to raw KG text
-        if not cypher_reviews and visa_req is None and not visa_free:
+        # If no hotels and no reviews and no visa and no popular block, fall back to raw KG text
+        if not cypher_reviews and visa_req is None and not visa_free and not popular_hotels:
             raw_kg = (cypher_answer or "").strip()
             raw_emb1 = (embeddings_model1 or "").strip()
             raw_emb2 = (embeddings_model2 or "").strip()
@@ -158,14 +187,15 @@ def main_llm_call_with_metrics(
 
     context = "\n".join(context_lines)
 
+    # Persona (keep your strict “no meta talk” rules)
     persona = (
-       "You are a helpful travel assistant. "
-    "Use ONLY the information in the Context. "
-    "you can explain the context i gave u, but don't add any extra information."
-    "NEVER mention the words 'context', 'provided context', 'knowledge graph', 'KG', 'retrieval', 'Cypher', or 'embeddings'. "
-    "NEVER explain your reasoning process. "
-    "If information is missing, say: 'I don’t have that information.' "
-    "Answer directly as if you already know the facts."
+        "You are a helpful travel assistant. "
+        "Use ONLY the information in the Context. "
+        "You can explain the info, but don't add any extra information. "
+        "NEVER mention the words 'context', 'provided context', 'knowledge graph', 'KG', 'retrieval', 'Cypher', or 'embeddings'. "
+        "NEVER explain your reasoning process. "
+        "If information is missing, say: 'I don’t have that information.' "
+        "Answer directly as if you already know the facts."
     )
 
     task = _build_task_for_scenario(scenario)
@@ -203,65 +233,63 @@ def main_llm_call_with_metrics(
 def _build_task_for_scenario(scenario: str) -> str:
     if scenario == "VISA_REQUIREMENT":
         return (
-            "This is a visa question. Use ONLY the Cypher (baseline) visa information in the Context. "
-            "Ignore embeddings completely even if they exist. "
-            "Answer with the visa type exactly as shown. "
-            "If it is missing, say it is not available in the KG context."
+            "This is a visa question. Use ONLY the visa information. "
+            "Ignore anything else. Answer with the visa type exactly."
         )
 
     if scenario == "VISA_FREE_LIST":
         return (
-            "This is a visa-free destinations question. Use ONLY the Cypher (baseline) list in the Context. "
-            "Ignore embeddings completely even if they exist. "
+            "This is a visa-free destinations question. Use ONLY the list. "
             "Return the destinations as bullet points. Do not invent countries."
+        )
+
+  
+    if scenario == "POPULAR_HOTELS_FOR_NATIONALITY":
+        return (
+            "The user asked for hotels popular among travellers from a nationality. "
+            "These hotels are already filtered as popular among travellers from the requested nationality",
+            "This is the information you have on popular hotels in a country for travelers from a nationality."
+            "Return the hotels as bullet points with their city, country, stars, and avg review if present. "
+            "Do not invent hotels or claims."
         )
 
     if scenario == "REVIEWS_ONLY":
         return (
-            "The context contains latest reviews. "
-            "Return the reviews to the user as a bullet list. "
-            "Do not invent reviews. Do not add extra facts. "
-            "Keep the review text exactly as provided (no paraphrasing)."
+            "Return the reviews as a bullet list. "
+            "Do not invent reviews. Do not paraphrase the review text."
         )
 
     if scenario == "NO_KG_ANSWER":
         return (
-            "The context contains no relevant answer. "
-            "Explain clearly that the KG retrieval returned no answer for the user question. "
-            "Ask ONE short follow-up question that would help retrieval (city, country, star rating, etc.). "
-            "Do not invent facts."
+            "There is no relevant answer available. "
+            "Say you don’t have that information. Ask ONE short follow-up question."
         )
 
     if scenario == "CYPHER_ONLY":
         return (
-            "Answer using ONLY Cypher results in the context. "
-            "Do not use similarity as evidence. "
-            "If the user requested constraints not present in the context, say they are not available."
+            "Answer using ONLY baseline hotel results. "
+            "Do not use similarity as evidence."
         )
 
     if scenario == "EMBEDDINGS_ONLY":
         return (
-            "Answer using ONLY embeddings results in the context. "
-            "Be explicit that these are similarity-based candidates, not guaranteed exact KG matches. "
-            "If the user needs exact constraints (like star rating), say you cannot confirm from the context."
+            "Answer using ONLY embeddings results. "
+            "Say they are similarity-based candidates and may not exactly match constraints."
         )
 
     if scenario == "CONTRADICTION":
         return (
-            "Cypher and embeddings appear to disagree. "
-            "Prefer Cypher for factual constraints (stars, city, country, scores). "
-            "Use embeddings only as possible alternatives and clearly label them as similarity-based. "
-            "If a hotel appears only in embeddings, do not claim it satisfies constraints unless the context proves it."
+            "Prefer baseline hotel facts. "
+            "Embeddings can be mentioned only as possible alternatives."
         )
 
     if scenario == "CYPHER_MORE_RELIABLE":
         return (
-            "Both Cypher and embeddings exist, but Cypher is more reliable here. "
-            "Base your main answer on Cypher hotels, then optionally mention embeddings hotels as secondary suggestions. "
-            "Do not let embeddings override Cypher constraints."
+            "Base your answer on baseline hotels first, embeddings second. "
+            "Do not let embeddings override constraints."
         )
 
-    return "Answer the user question using only the provided context. Do not invent facts."
+    return "Answer the user question using only the provided information. Do not invent facts."
 
 
 def _detect_scenario(
@@ -298,17 +326,6 @@ def _detect_scenario(
 
 
 def _parse_cypher(cypher_answer: str) -> List[Dict[str, Any]]:
-    """
-    Accepts lines like:
-      - The Golden Oasis | City: Dubai | Country: United Arab Emirates | Stars: 5.0 | Avg Review: 9.09 | Cleanliness: 9.3 | Comfort: 9.5 | Facilities: 9.6
-
-    Works whether the text includes a "Hotels:" header or not.
-    Parses any extra "Key: Value" pairs into the hotel dict.
-
-    Important: it skips review-rows like:
-      - Hotel: The Golden Oasis | Traveller type: ...
-    because those are handled by _parse_cypher_reviews().
-    """
     if not cypher_answer:
         return []
 
@@ -319,7 +336,6 @@ def _parse_cypher(cypher_answer: str) -> List[Dict[str, Any]]:
         if not line:
             continue
 
-        # skip header if present
         if line.lower().startswith("hotels:"):
             continue
 
@@ -334,11 +350,11 @@ def _parse_cypher(cypher_answer: str) -> List[Dict[str, Any]]:
             continue
 
         first = parts[0].strip().lower()
-        # Skip review rows: "Hotel: <name> | Traveller type: ..."
         if first.startswith("hotel:"):
             continue
-        # Skip visa bullets if they appear in the same text
         if first.startswith("visa type required:"):
+            continue
+        if first.startswith("stay count:"):
             continue
 
         name = parts[0]
@@ -348,7 +364,7 @@ def _parse_cypher(cypher_answer: str) -> List[Dict[str, Any]]:
             if ": " not in p:
                 continue
             k, v = p.split(": ", 1)
-            key = k.strip().lower().replace(" ", "_") 
+            key = k.strip().lower().replace(" ", "_")
             val_raw = v.strip()
 
             val: Any = val_raw
@@ -369,23 +385,92 @@ def _parse_cypher(cypher_answer: str) -> List[Dict[str, Any]]:
     return hotels
 
 
-def _parse_cypher_reviews(cypher_answer: str) -> List[Dict[str, Any]]:
+def _parse_popular_hotels_for_nationality(cypher_answer: str) -> List[Dict[str, Any]]:
     """
-    Parses Cypher output formatted like:
+    Expects something like:
 
-    Reviews (latest):
-    - Hotel: The Golden Oasis | Traveller type: Couple | Score: 9.2 | Review: First line...
-      continued line...
-    - Hotel: ...
+    Popular hotels for nationality:
+    - HotelName | City: X | Country: Y | Stars: 5 | Avg Review: 9.1 | Stay Count: 12 | Cleanliness: 9.0 ...
 
-    Supports multi-line reviews. Any line that does NOT start with "- " is treated
-    as a continuation of the previous review text.
+    If your header is different, change the header check string below.
     """
     if not cypher_answer:
         return []
 
     lines = cypher_answer.splitlines()
+    header_idx = None
+    for i, l in enumerate(lines):
+        if (l or "").strip().lower().startswith("popular hotels for nationality"):
+            header_idx = i
+            break
 
+    if header_idx is None:
+        return []
+
+    out: List[Dict[str, Any]] = []
+    for raw_line in lines[header_idx + 1 :]:
+        line = (raw_line or "").strip()
+        if not line:
+            continue
+        if line.startswith("- "):
+            line = line[2:].strip()
+
+        if " | " not in line:
+            continue
+
+        parts = [p.strip() for p in line.split(" | ") if p.strip()]
+        if not parts:
+            continue
+
+        h: Dict[str, Any] = {"name": parts[0]}
+
+        for p in parts[1:]:
+            if ": " not in p:
+                continue
+            k, v = p.split(": ", 1)
+            key = k.strip().lower().replace(" ", "_")
+            val_raw = v.strip()
+
+            val: Any = val_raw
+            try:
+                # stay count can be int
+                if key in ("stay_count", "count", "traveller_count"):
+                    val = int(float(val_raw))
+                else:
+                    val = float(val_raw)
+            except Exception:
+                val = val_raw
+
+            # normalize keys to match hotel printing
+            if key == "avg_review":
+                h["avg_review"] = val
+            elif key == "stars":
+                h["stars"] = val
+            elif key == "cleanliness":
+                h["cleanliness"] = val
+            elif key == "comfort":
+                h["comfort"] = val
+            elif key == "facilities":
+                h["facilities"] = val
+            elif key == "city":
+                h["city"] = val
+            elif key == "country":
+                h["country"] = val
+            elif key == "stay_count":
+                h["stay_count"] = val
+            else:
+                h[key] = val
+
+        out.append(h)
+
+    return out
+
+
+def _parse_cypher_reviews(cypher_answer: str) -> List[Dict[str, Any]]:
+    if not cypher_answer:
+        return []
+
+    lines = cypher_answer.splitlines()
     looks_like_reviews = any("reviews" in (l or "").strip().lower() for l in lines)
     if not looks_like_reviews:
         return []
@@ -412,7 +497,6 @@ def _parse_cypher_reviews(cypher_answer: str) -> List[Dict[str, Any]]:
 
         if line.strip().startswith("- "):
             flush_current()
-
             item = line.strip()[2:].strip()
             parts = [p.strip() for p in item.split(" | ") if p.strip()]
 
@@ -448,11 +532,6 @@ def _parse_cypher_reviews(cypher_answer: str) -> List[Dict[str, Any]]:
 
 
 def _parse_embeddings(embeddings_answer: str) -> List[Dict[str, Any]]:
-    """
-    Accepts lines like:
-      Kremlin Suites | Moscow, Russia | sim=0.7180
-      - The Golden Oasis | Dubai, United Arab Emirates | sim=0.7155
-    """
     if not embeddings_answer:
         return []
 
@@ -494,13 +573,6 @@ def _parse_embeddings(embeddings_answer: str) -> List[Dict[str, Any]]:
 
 
 def _parse_visa_requirement_single(cypher_answer: str) -> Dict[str, Any] | None:
-    """
-    Parses:
-      Visa requirements:
-      - Visa type required: NO_VISA
-    Returns:
-      {"visa_type": "NO_VISA"}
-    """
     if not cypher_answer:
         return None
 
@@ -522,14 +594,6 @@ def _parse_visa_requirement_single(cypher_answer: str) -> Dict[str, Any] | None:
 
 
 def _parse_visa_free_destinations(cypher_answer: str) -> List[Dict[str, Any]]:
-    """
-    Parses:
-      Visa-free destinations:
-      - Australia (NO_VISA)
-      - Brazil (NO_VISA)
-    Returns:
-      [{"country": "Australia", "visa_type": "NO_VISA"}, ...]
-    """
     if not cypher_answer:
         return []
 
@@ -590,9 +654,6 @@ def _hf_chat(
     temperature: float = 0.2,
     max_new_tokens: int = 512,
 ) -> Tuple[str, Dict[str, Any]]:
-    """
-    Hugging Face Router chat-completions API (OpenAI-compatible).
-    """
     if not HF_API_TOKEN:
         raise RuntimeError("HF_API_TOKEN is not set. Put it in config.py as HF_API_TOKEN='...'")
 
@@ -639,9 +700,6 @@ def _hf_chat(
 
 
 def _accuracy_proxy(answer: str, expected_keywords: List[str]) -> float:
-    """
-    Simple quantitative accuracy proxy based on keyword hits.
-    """
     if not expected_keywords:
         return 0.0
     a = (answer or "").lower()
@@ -653,16 +711,6 @@ def _accuracy_proxy(answer: str, expected_keywords: List[str]) -> float:
 
 
 def run_llm_benchmark(test_cases: List[Dict[str, Any]]) -> None:
-    """
-    Milestone d:
-      - Quantitative: accuracy_proxy, latency, cost
-      - Qualitative: writes a template CSV for human scoring
-
-    test_cases item must contain:
-      id, user_query, cypher_answer,
-      embeddings_answer_model1, embeddings_answer_model2,
-      expected_keywords
-    """
     models = ["deepseek", "llama", "gemma"]
     results: List[Dict[str, Any]] = []
     human_eval: List[Dict[str, Any]] = []

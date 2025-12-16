@@ -1,6 +1,7 @@
 # milestone3.py
 
 from typing import Any, Dict, Tuple
+import re
 import json
 from llm_layer import main_llm_call
 from neo4j_client import neo4j_client
@@ -191,6 +192,40 @@ def choose_hotel_query(parsed: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
     return tpl["query"], tpl["params"]
 
 
+def handle_popular_hotels_for_nationality_intent(parsed: Dict[str, Any]):
+    countries = [c.lower() for c in parsed.get("countries", [])]
+    user_text = parsed.get("raw_text", "").lower()
+
+    if len(countries) < 2:
+        return "", "", {}, []
+
+    origin = None
+    destination = None
+
+    # detect "from X"
+    for c in countries:
+        if re.search(rf"\bfrom\s+(the\s+)?{re.escape(c)}\b", user_text):
+            origin = c
+            break
+
+    if origin is None:
+        origin = countries[-1]
+
+    destination = next(c for c in countries if c != origin)
+
+    tpl = template_5_popular_hotels_for_nationality(
+        nationality_country=origin,
+        destination_country=destination,
+        limit=10,
+    )
+
+    query, params = tpl["query"], tpl["params"]
+    results = neo4j_client.run(query, params)
+
+    cypher_answer = _format_cypher_answer_for_llm(results)
+
+    return cypher_answer, query, params, results
+
 def handle_hotel_recommendation_intent(parsed: Dict[str, Any]):
     query, params = choose_hotel_query(parsed)
     print("Using hotel RECOMMENDATION query with params:", params)
@@ -357,6 +392,10 @@ def run_graph_rag(
 
     elif intent == "visa_requirements":
         cypher_answer, cypher_query, cypher_params,results = handle_visa_search_intent(parsed)
+
+    elif intent == "popular_hotels_for_nationality":
+        cypher_answer, cypher_query, cypher_params, results = handle_popular_hotels_for_nationality_intent(parsed)
+
 
     else:
         cypher_query, cypher_params = choose_hotel_query(parsed)

@@ -91,7 +91,7 @@ You are a strict JSON generator for a hotel assistant.
 Read the user query and output ONLY a JSON object with this shape:
 
 {{
-  "intent": "<one of ['hotel_search', 'hotel_recommendation', 'hotel_reviews', 'visa_requirements', 'unknown_intent']>"
+  "intent": "<one of ['hotel_search', 'hotel_recommendation', 'hotel_reviews', 'visa_requirements',"popular_hotels_for_nationality", 'unknown_intent']>"
 }}
 
 Definitions:
@@ -118,6 +118,19 @@ Definitions:
     Look for words like "visa", "visa requirements", "do I need a visa",
     "visa free", etc.
     Examples: "Do Egyptians need a visa for Turkey?", "Is it visa free to travel from France to Spain?"
+
+- "popular_hotels_for_nationality":
+    The user asks about hotels preferred or popular among travellers from a
+    specific country or nationality.
+    Look for phrases like:
+      "travellers from <country>"
+      "tourists from <country>"
+      "<nationality> travellers"
+      "popular with <country> visitors"
+    Examples:
+      "Most popular hotels in Dubai for travellers from Egypt"
+      "Hotels in France liked by German tourists"
+      "Which hotels do Egyptians prefer in Istanbul?"
 
 - "unknown_intent":
     If the user query does not match any of the above intents.

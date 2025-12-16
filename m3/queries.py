@@ -49,7 +49,7 @@ def template_1_hotels_in_city(
         "city": city,
         "min_star": min_star,
         "min_review": min_review,
-        "max_star": max_star, 
+        "max_star": max_star,
         "limit": limit,
     }
     return {"query": query, "params": params}
@@ -105,7 +105,7 @@ def template_2_hotels_in_country(
         "country": country,
         "cities": [c.lower() for c in (cities or [])],
         "min_star": min_star,
-        "max_star": max_star, 
+        "max_star": max_star,
         "min_review": min_review,
         "limit": limit,
     }
@@ -151,41 +151,33 @@ def template_4_latest_reviews_for_hotel(
 # --------------------------------------------------------------------
 def template_5_popular_hotels_for_nationality(
     nationality_country: str,
+    destination_country: str | None = None,
     limit: int = 10,
 ) -> Dict[str, Any]:
-    """
-    Template 5: Get the most popular hotels among travellers from a specific country.
-
-    User example:
-        "What are the most popular hotels in Dubai for travellers from Egypt?"
-
-    Args:
-        nationality_country: Country name of traveller origin
-        limit: Max number of hotels
-
-    Returns:
-        Dict with 'query' and 'params'
-    """
     query = """
     MATCH (t:Traveller)-[:FROM_COUNTRY]->(orig:Country)
     MATCH (t)-[:STAYED_AT]->(h:Hotel)-[:LOCATED_IN]->(city:City)-[:LOCATED_IN]->(dest:Country)
     WHERE toLower(orig.name) = toLower($nationality_country)
+      AND ($destination_country IS NULL 
+           OR toLower(dest.name) = toLower($destination_country))
     WITH h, city, dest, count(DISTINCT t) AS stay_count,
          avg(h.average_reviews_score) AS avg_score
-    RETURN   
+    RETURN
         h AS h,
         city AS city,
-        country AS country,
+        dest AS country,
         h.star_rating AS star_rating,
         h.average_reviews_score AS average_reviews_score,
         h.cleanliness_base AS cleanliness,
         h.comfort_base AS comfort,
-        h.facilities_base AS facilities
+        h.facilities_base AS facilities,
+        stay_count AS stay_count
     ORDER BY stay_count DESC, avg_score DESC
     LIMIT $limit
     """
     params = {
         "nationality_country": nationality_country,
+        "destination_country": destination_country,
         "limit": limit,
     }
     return {"query": query, "params": params}
@@ -257,6 +249,8 @@ def template_9_visa_free_destinations(
     """
     params = {"from_country": from_country}
     return {"query": query, "params": params}
+
+
 # --------------------------------------------------------------------
 # Template 3: Hotels based on rating criteria (star_rating)
 # --------------------------------------------------------------------
@@ -474,6 +468,7 @@ def template_8_hotels_by_aspect_scores(
     }
 
     return {"query": query, "params": params}
+
 
 # --------------------------------------------------------------------
 # Template 10: Compare multiple hotels based on ratings and reviews
